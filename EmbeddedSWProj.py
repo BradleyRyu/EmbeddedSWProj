@@ -59,10 +59,18 @@ image = Image.new("RGB", (width, height))
 
 # Get drawing object to draw on image.
 draw = ImageDraw.Draw(image)
+fnt = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 30)
 
 # Clear display.
-draw.rectangle((0, 0, width, height), outline=0, fill=(255, 0, 0))
+doraemon = Image.open("bamboo_dor.png")
+doraemon = doraemon.resize((width, height))
+disp.image(doraemon)
+time.sleep(1)
+draw.rectangle((0, 0, width, height), outline=0, fill=(0, 0, 0))
+rcolor = tuple(int(x * 255) for x in hsv_to_rgb(random.random(), 1, 1))
+draw.text((-1, 100), "[[GAME START]]", font=fnt, fill=rcolor)
 disp.image(image)
+time.sleep(2)
 
 # Get drawing object to draw on image.
 draw = ImageDraw.Draw(image)
@@ -75,50 +83,45 @@ udlr_outline = "#00FFFF"
 button_fill = "#FF00FF"
 button_outline = "#FFFFFF"
 
-fnt = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 30)
+
 
 init_x = 100
 init_y = 100
 
 white = (255, 255, 255)
 
-
-draw.text((init_x, init_y), "@", font=fnt, fill=white)
-currentcolor = white
+doraemon = doraemon.resize((50, 50))
+disp.image(doraemon)
 
 while True:
-    up_fill = 0
+        
     if not button_U.value:  # up pressed
-        up_fill = udlr_fill
         init_y -= 5
         if init_y <= 0:
             init_y = 0
-        draw.text((init_x, init_y), "@", font=fnt, fill=currentcolor)
+        disp.image(doraemon)
 
     down_fill = 0
     if not button_D.value:  # down pressed
-        down_fill = udlr_fill
         init_y += 5
         if init_y >= 200:
             init_y = 200
-        draw.text((init_x, init_y), "@", font=fnt, fill=white)
+        disp.image(doraemon)
 
     left_fill = 0
     if not button_L.value:  # left pressed
-        left_fill = udlr_fill
         init_x -= 5
         if init_x <= 0:
             init_x = 0
-        draw.text((init_x, init_y), "@", font=fnt, fill=white)
+        disp.image(doraemon)
 
     right_fill = 0
     if not button_R.value:  # right pressed
-        right_fill = udlr_fill
         init_x += 5
         if init_x >= 200:
             init_x = 200
-        draw.text((init_x, init_y), "@", font=fnt, fill=white)
-
+        disp.image(doraemon)
+        
     center_fill = 0
     if not button_C.value:  # center pressed
         center_fill = button_fill
@@ -126,12 +129,12 @@ while True:
 
     A_fill = 0
     if not button_A.value:  # left pressed
-        currentcolor = (255, 0, 0)
+        new_color = (255, 0, 0)
     
 
     B_fill = 0
     if not button_B.value:  # left pressed
-        currentcolor = (0, 255, 0)
+        new_color = (0, 255, 0)
     
     
     # Display the Image
