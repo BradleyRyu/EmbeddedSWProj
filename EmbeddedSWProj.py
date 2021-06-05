@@ -83,8 +83,6 @@ udlr_outline = "#00FFFF"
 button_fill = "#FF00FF"
 button_outline = "#FFFFFF"
 
-
-
 init_x = 100
 init_y = 100
 
