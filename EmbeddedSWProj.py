@@ -3,7 +3,7 @@ import random
 from colorsys import hsv_to_rgb
 import board
 from digitalio import DigitalInOut, Direction
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageChops
 import adafruit_rgb_display.st7789 as st7789
 
 # Create the display
@@ -61,10 +61,10 @@ image = Image.new("RGB", (width, height))
 draw = ImageDraw.Draw(image)
 fnt = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 30)
 
-# Clear display.
-doraemon = Image.open("bamboo_dor.png")
-doraemon = doraemon.resize((width, height))
-disp.image(doraemon)
+# Loading display.
+doraemon_pic = Image.open("bamboo_dor.png")
+doraemon_pic = doraemon_pic.resize((width, height))
+disp.image(doraemon_pic)
 time.sleep(1)
 draw.rectangle((0, 0, width, height), outline=0, fill=(0, 0, 0))
 rcolor = tuple(int(x * 255) for x in hsv_to_rgb(random.random(), 1, 1))
@@ -77,68 +77,81 @@ draw = ImageDraw.Draw(image)
 
 # Draw a black filled box to clear the image.
 draw.rectangle((0, 0, width, height), outline=0, fill=0)
+disp.image(image)
 
-udlr_fill = "#00FF00"
-udlr_outline = "#00FFFF"
-button_fill = "#FF00FF"
-button_outline = "#FFFFFF"
+dor_loc_x = 120
+dor_loc_y = 120
 
+def Up(y):
+    if y <= -20:
+       y = -20
+    else:
+        global dor_loc_y
+        dor_loc_y -= 5
+        y -= 5
+    return y
 
+def Down(y):
+    if y >= 220:
+        y = 220
+    else:
+        global dor_loc_y
+        dor_loc_y += 5
+        y += 5
+    return y
 
-init_x = 100
-init_y = 100
+def Left(x):
+    if x <= -20:
+        x = -20
+    else:
+        global dor_loc_x
+        dor_loc_x -= 5
+        x -= 5
+    return x
 
-white = (255, 255, 255)
-
-doraemon = doraemon.resize((50, 50))
-disp.image(doraemon)
+def Right(x):
+    if x >= 220:
+        x = 220
+    else:
+        global dor_loc_x
+        dor_loc_x += 5
+        x += 5
+    return x
+    
+def Doraemon(x_dor, y_dor):
+    draw.ellipse((x_dor - 20, y_dor - 20, x_dor + 20, y_dor + 20), outline=(0, 0, 0), fill=(70, 161, 222))
+    
 
 while True:
-        
+    
+    Doraemon(dor_loc_x, dor_loc_y)
+    
+    
     if not button_U.value:  # up pressed
-        init_y -= 5
-        if init_y <= 0:
-            init_y = 0
-        disp.image(doraemon)
-
-    down_fill = 0
+        Doraemon(dor_loc_x, Up(dor_loc_y))
+    
     if not button_D.value:  # down pressed
-        init_y += 5
-        if init_y >= 200:
-            init_y = 200
-        disp.image(doraemon)
-
-    left_fill = 0
+        Doraemon(dor_loc_x, Down(dor_loc_y))
+    
     if not button_L.value:  # left pressed
-        init_x -= 5
-        if init_x <= 0:
-            init_x = 0
-        disp.image(doraemon)
+        Doraemon(Left(dor_loc_x), dor_loc_y)
 
-    right_fill = 0
     if not button_R.value:  # right pressed
-        init_x += 5
-        if init_x >= 200:
-            init_x = 200
-        disp.image(doraemon)
-        
-    center_fill = 0
+        Doraemon(Right(dor_loc_x), dor_loc_y)
+
     if not button_C.value:  # center pressed
         center_fill = button_fill
     
-
-    A_fill = 0
     if not button_A.value:  # left pressed
         new_color = (255, 0, 0)
     
-
-    B_fill = 0
     if not button_B.value:  # left pressed
         new_color = (0, 255, 0)
     
     
     # Display the Image
+    
     disp.image(image)
+    draw.rectangle((0, 0, width, height), outline=0, fill=0)
 
     time.sleep(0.01)
-    
