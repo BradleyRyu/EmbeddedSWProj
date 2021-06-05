@@ -79,8 +79,19 @@ draw = ImageDraw.Draw(image)
 draw.rectangle((0, 0, width, height), outline=0, fill=0)
 disp.image(image)
 
+#DORAEMON LOCATION
 dor_loc_x = 120
 dor_loc_y = 120
+
+#ULTIMATE SKILL : defense all attacks
+cool_time = 20
+
+def Ultimate_skill():
+    global cool_time
+    
+    if cool_time <= 0:
+        draw.text(())
+
 
 def Up(y):
     if y <= -20:
@@ -119,7 +130,10 @@ def Right(x):
     return x
     
 def Doraemon(x_dor, y_dor):
-    draw.ellipse((x_dor - 20, y_dor - 20, x_dor + 20, y_dor + 20), outline=(0, 0, 0), fill=(70, 161, 222))
+    # r = 20
+    draw.ellipse((x_dor - 20, y_dor - 20, x_dor + 20, y_dor + 20), outline=(255, 255, 255), fill=(70, 161, 222))
+    
+
     
 
 while True:
@@ -142,10 +156,10 @@ while True:
     if not button_C.value:  # center pressed
         center_fill = button_fill
     
-    if not button_A.value:  # left pressed
+    if not button_A.value:  # 5 pressed
         new_color = (255, 0, 0)
     
-    if not button_B.value:  # left pressed
+    if not button_B.value:  # 6 pressed
         new_color = (0, 255, 0)
     
     
