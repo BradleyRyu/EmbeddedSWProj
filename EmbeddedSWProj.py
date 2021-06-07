@@ -111,8 +111,7 @@ def Draw_bull(bull_loc_x, bull_loc_y):
     draw.rectangle((0, 50, width, height), outline=0, fill=0)
     Doraemon(dor_loc_x, dor_loc_y)
     
-    
-    # if bullet touches the top of Doraemon
+    # if bullet touches Doraemon
     """
     if ((dor_loc_y - 20) - bottom_y <= 1) and (right_x > dor_loc_x - 20  or left_x < dor_loc_x + 20):
         for i in range(5):
