@@ -87,6 +87,7 @@ dor_loc_y = 120
 bull_loc_x = 120
 bull_loc_y = 0
 
+<<<<<<< HEAD
 #ULTIMATE SKILL : defense all attacks
 cool_time = 20
 score = 0
@@ -166,6 +167,10 @@ def Right(x):
     return x
     
 
+=======
+init_x = 100
+init_y = 100
+>>>>>>> 13b526ba86226206f0f61b72c8c04342749610bc
 
 init_time = time.time()
 
@@ -211,5 +216,9 @@ while True:
     draw.rectangle((0, 0, width, height), outline=0, fill=0)
 
     time.sleep(0.01)
+<<<<<<< HEAD
 
 
+=======
+    
+>>>>>>> 13b526ba86226206f0f61b72c8c04342749610bc
