@@ -1,3 +1,13 @@
+"""
+Question
+bullet falls from the top and I have to move Doraemon.
+however, i cannot move Doraemon until Laser arrives Bottom.
+How can i move Doraemon independently?
+"""
+
+
+
+
 import time
 import random
 from colorsys import hsv_to_rgb
@@ -83,13 +93,15 @@ disp.image(image)
 dor_loc_x = 120
 dor_loc_y = 120
 
-#init bullet location
-bull_loc_x = 120
-bull_loc_y = 0
+#init laser location
+laser_loc_x = 120
+laser_loc_y = 0
 
-<<<<<<< HEAD
+
 #ULTIMATE SKILL : defense all attacks
 cool_time = 20
+
+#score 
 score = 0
 
 def Doraemon(x_dor, y_dor):
@@ -97,20 +109,20 @@ def Doraemon(x_dor, y_dor):
     draw.rectangle((x_dor - 20, y_dor - 20, x_dor + 20, y_dor + 20), outline=(255, 255, 255), fill=(70, 161, 222))
     
 
-def Draw_bull(bull_loc_x, bull_loc_y):
+def Draw_laser(laser_loc_x, laser_loc_y):
     
-    top_x = bull_loc_x
-    top_y = bull_loc_y
-    left_x = bull_loc_x - 5
-    bottom_y = bull_loc_y + 8.66
-    right_x = bull_loc_x + 5
+    top_x = laser_loc_x
+    top_y = laser_loc_y
+    left_x = laser_loc_x - 5
+    bottom_y = laser_loc_y + 8.66
+    right_x = laser_loc_x + 5
     
     draw.polygon([(top_x, top_y), (left_x, bottom_y), (right_x, bottom_y)],
                  outline=(random.randint(-100, 100) % 256, random.randint(-100, 100) % 256, random.randint(-100, 100) % 256),
                  fill=(255, 0, 0))
     disp.image(image)
-    draw.rectangle((0, 50, width, height), outline=0, fill=0)
     Doraemon(dor_loc_x, dor_loc_y)
+    
     
     # if bullet touches Doraemon
     """
@@ -125,10 +137,10 @@ def Draw_bull(bull_loc_x, bull_loc_y):
         time.sleep(2)
         exit()
     """
-def Bullets():
-    bull_loc_x = random.randint(0, 240)
+def Laser():
+    laser_loc_x = random.randint(0, 240)
     for i in range(24):
-        Draw_bull(bull_loc_x, i * 10)
+        Draw_laser(laser_loc_x, i * 10)
         
 def Up(y):
     if y <= 30:
@@ -167,10 +179,10 @@ def Right(x):
     return x
     
 
-=======
+
 init_x = 100
 init_y = 100
->>>>>>> 13b526ba86226206f0f61b72c8c04342749610bc
+
 
 init_time = time.time()
 
@@ -185,7 +197,7 @@ while True:
     score += 1
     
     Doraemon(dor_loc_x, dor_loc_y)
-    Bullets()
+    Laser()
     
     if not button_U.value:  # up pressed
         Doraemon(dor_loc_x, Up(dor_loc_y))
@@ -216,9 +228,4 @@ while True:
     draw.rectangle((0, 0, width, height), outline=0, fill=0)
 
     time.sleep(0.01)
-<<<<<<< HEAD
 
-
-=======
-    
->>>>>>> 13b526ba86226206f0f61b72c8c04342749610bc
