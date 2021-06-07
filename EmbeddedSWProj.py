@@ -83,19 +83,55 @@ disp.image(image)
 dor_loc_x = 120
 dor_loc_y = 120
 
+#init bullet location
+bull_loc_x = 120
+bull_loc_y = 0
+
 #ULTIMATE SKILL : defense all attacks
 cool_time = 20
+score = 0
 
-def Ultimate_skill():
-    global cool_time
+def Doraemon(x_dor, y_dor):
+    # r = 20
+    draw.rectangle((x_dor - 20, y_dor - 20, x_dor + 20, y_dor + 20), outline=(255, 255, 255), fill=(70, 161, 222))
     
-    if cool_time <= 0:
-        draw.text(())
 
-
+def Draw_bull(bull_loc_x, bull_loc_y):
+    
+    top_x = bull_loc_x
+    top_y = bull_loc_y
+    left_x = bull_loc_x - 5
+    bottom_y = bull_loc_y + 8.66
+    right_x = bull_loc_x + 5
+    
+    draw.polygon([(top_x, top_y), (left_x, bottom_y), (right_x, bottom_y)],
+                 outline=(random.randint(-100, 100) % 256, random.randint(-100, 100) % 256, random.randint(-100, 100) % 256),
+                 fill=(255, 0, 0))
+    disp.image(image)
+    draw.rectangle((0, 50, width, height), outline=0, fill=0)
+    Doraemon(dor_loc_x, dor_loc_y)
+    
+    # if bullet touches the top of Doraemon
+    """
+    if ((dor_loc_y - 20) - bottom_y <= 1) and (right_x > dor_loc_x - 20  or left_x < dor_loc_x + 20):
+        for i in range(5):
+            draw.rectangle((0, 0, width, height), outline=0, fill=0)
+            draw.text((45, 80), "|| JIN GU ||",font=fnt, fill=rcolor)
+            disp.image(image)
+            time.sleep(0.3)
+            draw.text((30, 140),"||GOT YOU||", font=fnt, fill=rcolor)
+            disp.image(image)
+        time.sleep(2)
+        exit()
+    """
+def Bullets():
+    bull_loc_x = random.randint(0, 240)
+    for i in range(24):
+        Draw_bull(bull_loc_x, i * 10)
+        
 def Up(y):
-    if y <= -20:
-       y = -20
+    if y <= 30:
+       y = 30
     else:
         global dor_loc_y
         dor_loc_y -= 5
@@ -103,8 +139,8 @@ def Up(y):
     return y
 
 def Down(y):
-    if y >= 220:
-        y = 220
+    if y >= 210:
+        y = 210
     else:
         global dor_loc_y
         dor_loc_y += 5
@@ -112,8 +148,8 @@ def Down(y):
     return y
 
 def Left(x):
-    if x <= -20:
-        x = -20
+    if x <= 30:
+        x = 30
     else:
         global dor_loc_x
         dor_loc_x -= 5
@@ -121,25 +157,30 @@ def Left(x):
     return x
 
 def Right(x):
-    if x >= 220:
-        x = 220
+    if x >= 210:
+        x = 210
     else:
         global dor_loc_x
         dor_loc_x += 5
         x += 5
     return x
     
-def Doraemon(x_dor, y_dor):
-    # r = 20
-    draw.ellipse((x_dor - 20, y_dor - 20, x_dor + 20, y_dor + 20), outline=(255, 255, 255), fill=(70, 161, 222))
-    
 
-    
+
+init_time = time.time()
+
 
 while True:
     
-    Doraemon(dor_loc_x, dor_loc_y)
     
+    #if (time.time() - init_time) % 10 == 0 and (time.time() - init_time) > 1:
+    
+    draw.text((0, 0), "score:", font=fnt, fill=(255, 255, 255))
+    draw.text((100, 0), str(score), font=fnt, fill=(255, 255, 255))
+    score += 1
+    
+    Doraemon(dor_loc_x, dor_loc_y)
+    Bullets()
     
     if not button_U.value:  # up pressed
         Doraemon(dor_loc_x, Up(dor_loc_y))
@@ -164,8 +205,9 @@ while True:
     
     
     # Display the Image
-    
     disp.image(image)
+    
+    # Clear Display
     draw.rectangle((0, 0, width, height), outline=0, fill=0)
 
     time.sleep(0.01)
