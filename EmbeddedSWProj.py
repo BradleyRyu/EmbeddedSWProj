@@ -65,15 +65,16 @@ backlight.value = True
 # Make sure to create image with mode 'RGB' for color.
 width = disp.width
 height = disp.height
-image = Image.new("RGB", (width, height))
+image = Image.new("RGBA", (width, height))
 
 # Get drawing object to draw on image.
 draw = ImageDraw.Draw(image)
 fnt = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 30)
 
 # Loading display.
-doraemon_pic = Image.open("bamboo_dor.png")
-doraemon_pic = doraemon_pic.resize((width, height))
+doraemon_pic2 = Image.open("bamboo_dor.png")
+doraemon_pic = doraemon_pic2.resize((width, height))
+doraemon_character = doraemon_pic2.resize((50, 50))
 disp.image(doraemon_pic)
 time.sleep(1)
 draw.rectangle((0, 0, width, height), outline=0, fill=(0, 0, 0))
@@ -104,10 +105,10 @@ cool_time = 20
 #score 
 score = 0
 
-def Doraemon(x_dor, y_dor):
-    # r = 20
-    draw.rectangle((x_dor - 20, y_dor - 20, x_dor + 20, y_dor + 20), outline=(255, 255, 255), fill=(70, 161, 222))
-    
+def Doraemon(x_dor, y_dor, doraemon):
+    # square of 40 
+    #draw.rectangle((x_dor - 20, y_dor - 20, x_dor + 20, y_dor + 20), outline=(255, 255, 255), fill=(70, 161, 222))
+    image.paste(doraemon, (x_dor - 20,y_dor - 20), doraemon)
 
 def Draw_laser(laser_loc_x, laser_loc_y):
     
@@ -120,13 +121,11 @@ def Draw_laser(laser_loc_x, laser_loc_y):
     draw.polygon([(top_x, top_y), (left_x, bottom_y), (right_x, bottom_y)],
                  outline=(random.randint(-100, 100) % 256, random.randint(-100, 100) % 256, random.randint(-100, 100) % 256),
                  fill=(255, 0, 0))
-    disp.image(image)
-    Doraemon(dor_loc_x, dor_loc_y)
     
     
     # if bullet touches Doraemon
-    """
-    if ((dor_loc_y - 20) - bottom_y <= 1) and (right_x > dor_loc_x - 20  or left_x < dor_loc_x + 20):
+    
+    if ((dor_loc_y - 20) - bottom_y <= 10) and (right_x > dor_loc_x - 20  or left_x < dor_loc_x + 20):
         for i in range(5):
             draw.rectangle((0, 0, width, height), outline=0, fill=0)
             draw.text((45, 80), "|| JIN GU ||",font=fnt, fill=rcolor)
@@ -136,11 +135,23 @@ def Draw_laser(laser_loc_x, laser_loc_y):
             disp.image(image)
         time.sleep(2)
         exit()
-    """
-def Laser():
-    laser_loc_x = random.randint(0, 240)
-    for i in range(24):
-        Draw_laser(laser_loc_x, i * 10)
+    
+def Laser(laser_loc_x, laser_loc_y):
+    
+    if laser_loc_y >= 240:
+        laser_loc_x = random.randint(0, 240)
+        laser_loc_y = 0
+    
+    #triangle coordinate
+    top_x = laser_loc_x
+    top_y = laser_loc_y
+    left_x = laser_loc_x - 5
+    bottom_y = laser_loc_y + 8.66
+    right_x = laser_loc_x + 5
+    
+    draw.polygon([(top_x, top_y), (left_x, bottom_y), (right_x, bottom_y)],
+                 outline=(random.randint(-100, 100) % 256, random.randint(-100, 100) % 256, random.randint(-100, 100) % 256),
+                 fill=(255, 0, 0))
         
 def Up(y):
     if y <= 30:
@@ -182,44 +193,49 @@ def Right(x):
 
 init_x = 100
 init_y = 100
+stage = 1
 
 
 init_time = time.time()
 
-
 while True:
     
+    draw.text((0, 0), str(score), font=fnt, fill=(255, 255, 255))
     
-    #if (time.time() - init_time) % 10 == 0 and (time.time() - init_time) > 1:
+    if score % 10 == 0 and score > 5:
+        stage += 1
     
-    draw.text((0, 0), "score:", font=fnt, fill=(255, 255, 255))
-    draw.text((100, 0), str(score), font=fnt, fill=(255, 255, 255))
-    score += 1
-    
-    Doraemon(dor_loc_x, dor_loc_y)
-    Laser()
     
     if not button_U.value:  # up pressed
-        Doraemon(dor_loc_x, Up(dor_loc_y))
+        Up(dor_loc_y)
     
     if not button_D.value:  # down pressed
-        Doraemon(dor_loc_x, Down(dor_loc_y))
+        Down(dor_loc_y)
     
     if not button_L.value:  # left pressed
-        Doraemon(Left(dor_loc_x), dor_loc_y)
+        Left(dor_loc_x)
 
     if not button_R.value:  # right pressed
-        Doraemon(Right(dor_loc_x), dor_loc_y)
-
+        Right(dor_loc_x)
+        
     if not button_C.value:  # center pressed
         center_fill = button_fill
     
     if not button_A.value:  # 5 pressed
         new_color = (255, 0, 0)
     
+    
     if not button_B.value:  # 6 pressed
         new_color = (0, 255, 0)
     
+    laser_loc_y += 10
+    if laser_loc_y >= 240:
+        laser_loc_x = random.randint(0, 240)
+        laser_loc_y = 0
+        score += 1
+    
+    Doraemon(dor_loc_x, dor_loc_y, doraemon_character)
+    Laser(laser_loc_x, laser_loc_y)
     
     # Display the Image
     disp.image(image)
