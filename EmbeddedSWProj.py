@@ -1,13 +1,3 @@
-"""
-Question
-bullet falls from the top and I have to move Doraemon.
-however, i cannot move Doraemon until Laser arrives Bottom.
-How can i move Doraemon independently?
-"""
-
-
-
-
 import time
 import random
 from colorsys import hsv_to_rgb
@@ -62,7 +52,7 @@ backlight.switch_to_output()
 backlight.value = True
 
 # Create blank image for drawing.
-# Make sure to create image with mode 'RGB' for color.
+# Make sure to create image with mode 'RGBA' for color.
 width = disp.width
 height = disp.height
 image = Image.new("RGBA", (width, height))
@@ -72,9 +62,9 @@ draw = ImageDraw.Draw(image)
 fnt = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 30)
 
 # Loading display.
-doraemon_pic2 = Image.open("bamboo_dor.png")
-doraemon_pic = doraemon_pic2.resize((width, height))
-doraemon_character = doraemon_pic2.resize((50, 50))
+doraemon_pic = Image.open("bamboo_dor.png")
+doraemon_pic = doraemon_pic.resize((width, height))
+doraemon_character = doraemon_pic.resize((50, 50))
 disp.image(doraemon_pic)
 time.sleep(1)
 draw.rectangle((0, 0, width, height), outline=0, fill=(0, 0, 0))
@@ -90,16 +80,20 @@ draw = ImageDraw.Draw(image)
 draw.rectangle((0, 0, width, height), outline=0, fill=0)
 disp.image(image)
 
-#DORAEMON LOCATION
+#Jin Gu
+jingu_temp = Image.open("bamboo_njg.png")
+jingu_character = jingu_temp.resize((20, 20))
+
+#initializing DORAEMON LOCATION
 dor_loc_x = 120
 dor_loc_y = 120
 
-#init laser location
-laser_loc_x = 120
+#initializing laser location
+laser_loc_x = random.randint(0, 240)
 laser_loc_y = 0
 
 
-#ULTIMATE SKILL : defense all attacks
+#ULTIMATE SKILL : defense all attacks for 5sec
 cool_time = 20
 
 #score 
@@ -110,37 +104,21 @@ def Doraemon(x_dor, y_dor, doraemon):
     #draw.rectangle((x_dor - 20, y_dor - 20, x_dor + 20, y_dor + 20), outline=(255, 255, 255), fill=(70, 161, 222))
     image.paste(doraemon, (x_dor - 20,y_dor - 20), doraemon)
 
-def Draw_laser(laser_loc_x, laser_loc_y):
     
-    top_x = laser_loc_x
-    top_y = laser_loc_y
-    left_x = laser_loc_x - 5
-    bottom_y = laser_loc_y + 8.66
-    right_x = laser_loc_x + 5
-    
-    draw.polygon([(top_x, top_y), (left_x, bottom_y), (right_x, bottom_y)],
-                 outline=(random.randint(-100, 100) % 256, random.randint(-100, 100) % 256, random.randint(-100, 100) % 256),
-                 fill=(255, 0, 0))
+def Laser(jingu):
     
     
-    # if bullet touches Doraemon
+    global dor_loc_x
+    global dor_lox_y
+    global laser_loc_x
+    global laser_loc_y
+    global score
     
-    if ((dor_loc_y - 20) - bottom_y <= 10) and (right_x > dor_loc_x - 20  or left_x < dor_loc_x + 20):
-        for i in range(5):
-            draw.rectangle((0, 0, width, height), outline=0, fill=0)
-            draw.text((45, 80), "|| JIN GU ||",font=fnt, fill=rcolor)
-            disp.image(image)
-            time.sleep(0.3)
-            draw.text((30, 140),"||GOT YOU||", font=fnt, fill=rcolor)
-            disp.image(image)
-        time.sleep(2)
-        exit()
-    
-def Laser(laser_loc_x, laser_loc_y):
-    
+    laser_loc_y += 10
     if laser_loc_y >= 240:
         laser_loc_x = random.randint(0, 240)
         laser_loc_y = 0
+        score += 1
     
     #triangle coordinate
     top_x = laser_loc_x
@@ -149,9 +127,34 @@ def Laser(laser_loc_x, laser_loc_y):
     bottom_y = laser_loc_y + 8.66
     right_x = laser_loc_x + 5
     
+    image.paste(jingu, (laser_loc_x, 0), jingu)
+    
     draw.polygon([(top_x, top_y), (left_x, bottom_y), (right_x, bottom_y)],
                  outline=(random.randint(-100, 100) % 256, random.randint(-100, 100) % 256, random.randint(-100, 100) % 256),
                  fill=(255, 0, 0))
+    
+    # deciding box
+    #draw.rectangle((dor_loc_x - 20, dor_loc_y - 20, dor_loc_x + 20, dor_loc_y + 20), outline=0, fill=(255, 255, 255))
+    
+    # if laser touches doraemon, exit the game
+    if dor_loc_y - 20 <= bottom_y and dor_loc_y + 20 >= top_y:
+        if right_x >= dor_loc_x - 20 and left_x <= dor_loc_x + 20:
+            for i in range(5):
+                draw.rectangle((0, 0, width, height), outline=0, fill=0)
+                draw.text((45, 80), "|| JIN GU ||",font=fnt, fill=rcolor)
+                disp.image(image)
+                time.sleep(0.3)
+                draw.text((30, 140),"||GOT YOU||", font=fnt, fill=rcolor)
+                disp.image(image)
+            time.sleep(2)
+            exit()
+            
+def ultimate_skill(dor_loc_x, dor_loc_y):
+    
+    draw.ellipse((dor_loc_x - 25, dor_loc_y - 25, dor_loc_x + 25, dor_loc_y + 35),
+                 fill = (random.randint(-100, 100) % 256, random.randint(-100, 100) % 256, random.randint(-100, 100) % 256),
+                 outline = (255, 255, 0))
+    
         
 def Up(y):
     if y <= 30:
@@ -190,13 +193,8 @@ def Right(x):
     return x
     
 
-
-init_x = 100
-init_y = 100
 stage = 1
 
-
-init_time = time.time()
 
 while True:
     
@@ -219,7 +217,7 @@ while True:
         Right(dor_loc_x)
         
     if not button_C.value:  # center pressed
-        center_fill = button_fill
+        pass
     
     if not button_A.value:  # 5 pressed
         new_color = (255, 0, 0)
@@ -228,14 +226,15 @@ while True:
     if not button_B.value:  # 6 pressed
         new_color = (0, 255, 0)
     
-    laser_loc_y += 10
     if laser_loc_y >= 240:
         laser_loc_x = random.randint(0, 240)
         laser_loc_y = 0
         score += 1
     
     Doraemon(dor_loc_x, dor_loc_y, doraemon_character)
-    Laser(laser_loc_x, laser_loc_y)
+    ultimate_skill(dor_loc_x, dor_loc_y)
+    
+    Laser(jingu_character)
     
     # Display the Image
     disp.image(image)
