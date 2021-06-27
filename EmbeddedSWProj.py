@@ -173,7 +173,7 @@ def Laser(jingu):
     
     # if over stage 1, difficulty goes up
     if stage > 1:
-        root_rand_float = np.sqrt(random.uniform(0.8, 1.2)) * stage
+        root_rand_float = np.sqrt(random.uniform(0.8, 1.2) * stage)
     #this part draws laser. variables below are used to draw triangle coordinate
     top_x = laser_loc_x
     top_y = laser_loc_y
@@ -193,21 +193,7 @@ def Laser(jingu):
     #draw.rectangle((dor_loc_x - 15, dor_loc_y - 15, dor_loc_x + 20, dor_loc_y + 25), outline=0, fill=(255, 255, 255))
     
     # if laser touches doraemon, exit the game
-    if not ultimate_skill_1(dor_loc_x, dor_loc_y):
-        if dor_loc_y - 15 <= bottom_y and dor_loc_y + 25 >= top_y:
-            if right_x >= dor_loc_x - 15 and left_x <= dor_loc_x + 20:
-                for i in range(5):
-                    draw.rectangle((0, 0, width, height), outline=0, fill=0)
-                    draw.text((45, 80), "|| JIN GU ||",font=fnt, fill=rcolor)
-                    disp.image(image)
-                    time.sleep(0.3)
-                    draw.text((30, 140),"||GOT YOU||", font=fnt, fill=rcolor)
-                    time.sleep(0.3)
-                    draw.text((40, 200), "SCORE", font=fnt, fill=rcolor)
-                    draw.text((150, 200), str(score), font=fnt, fill=rcolor)
-                    disp.image(image)
-                time.sleep(2)
-                exit()
+    end_game(top_x, top_y, left_x, bottom_y, right_x)
 
 
 # Ultimate Skill 1 is to avoid all the attacks from doraemon.
@@ -217,6 +203,7 @@ def ultimate_skill_1(dor_loc_x, dor_loc_y):
     global prev_time_1
     global lasting_time_1
     
+    # if user used skill and no time remaining
     if lasting_time_1 < 0.1:
         prev_time_1 = time.time()
         curr_time_skill_1 = time.time()
@@ -224,12 +211,15 @@ def ultimate_skill_1(dor_loc_x, dor_loc_y):
         image.paste(ultimate_1, (210, 240), ultimate_1)
         return False
     
+    #if there is time remaining
     if lasting_time_1 >= 0.1 and curr_time_skill_1 - prev_time_1 >= 30:
         image.paste(ultimate_1, (210, 210), ultimate_1)
         if not button_A.value:
             draw.ellipse((dor_loc_x - 25, dor_loc_y - 25, dor_loc_x + 25, dor_loc_y + 35),
                  fill = (random.randint(-100, 100) % 256, random.randint(-100, 100) % 256, random.randint(-100, 100) % 256),
                  outline = (255, 255, 0))
+            #because this function is called twice, here and in end_game, so the using time is half
+            #it lasts for 5 secs.
             lasting_time_1 = lasting_time_1 - 0.05
             curr_time_skill_1 = time.time()
             return True
@@ -246,34 +236,55 @@ def ultimate_skill_2():
     global lasting_time_2
     global button_pressed_2
     
-    if lasting_time_2 < 0.1:
+    # if user used skill and no time remaining
+    if lasting_time_2 < 0.1: 
         prev_time_2 = time.time()
         curr_time_skill_2 = time.time()
         lasting_time_2 = 5
         dor_velocity = 5
         button_pressed_2 = True
         image.paste(ultimate_2, (210, 240), ultimate_2)
-        
+    
+    # if there is time remaining
     if lasting_time_2 >= 0.1 and curr_time_skill_2 - prev_time_2 >= 30:
         image.paste(ultimate_2, (180, 210), ultimate_2)
         if not button_B.value:
-            lasting_time_2 = lasting_time_2 - 0.05
-            curr_time_skill_2 = time.time()
             if button_pressed_2:
                 dor_velocity = dor_velocity * 2
                 button_pressed_2 = False
+            # it lasts for 5s
+            lasting_time_2 = lasting_time_2 - 0.1
+            curr_time_skill_2 = time.time()
+        else:
+            dor_velocity = 5
+            button_pressed_2 = True
+            
                 
 def stage_up():
     global score
     global prev_score
     global stage
-    global stage_up_available
-    global laser_loc_y
-    global rand_float
     
     if score % 10 == 0 and score > 0 and not score == prev_score:
         stage = stage + 1
-        rand_float = random.uniform(0.8, 1.2) * stage
+        
+def end_game(top_x, top_y, left_x, bottom_y, right_x):
+    
+    if not ultimate_skill_1(dor_loc_x, dor_loc_y):
+        if dor_loc_y - 15 <= bottom_y and dor_loc_y + 25 >= top_y:
+            if right_x >= dor_loc_x - 15 and left_x <= dor_loc_x + 20:
+                for i in range(5):
+                    draw.rectangle((0, 0, width, height), outline=0, fill=0)
+                    draw.text((45, 80), "|| JIN GU ||",font=fnt, fill=rcolor)
+                    disp.image(image)
+                    time.sleep(0.3)
+                    draw.text((30, 140),"||GOT YOU||", font=fnt, fill=rcolor)
+                    time.sleep(0.3)
+                    draw.text((40, 200), "SCORE", font=fnt, fill=rcolor)
+                    draw.text((150, 200), str(score), font=fnt, fill=rcolor)
+                    disp.image(image)
+                time.sleep(2)
+                exit()
 
 def Up(y):
     if y <= 30:
@@ -374,4 +385,3 @@ while True:
     
 
     time.sleep(0.01)
-
