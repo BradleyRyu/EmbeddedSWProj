@@ -1,11 +1,15 @@
 import time
 import random
+import numpy as np
 from colorsys import hsv_to_rgb
 import board
 from digitalio import DigitalInOut, Direction
 from PIL import Image, ImageDraw, ImageFont, ImageChops
 import adafruit_rgb_display.st7789 as st7789
 
+"""
+    @@@@@ initial setting @@@@@
+"""
 # Create the display
 cs_pin = DigitalInOut(board.CE0)
 dc_pin = DigitalInOut(board.D25)
@@ -100,60 +104,92 @@ ultimate_2_temp = Image.open("ultimate_skill2.png")
 ultimate_2 = ultimate_2_temp.resize((30, 30))
 last_ultimate_2 = time.time()
 
+
+"""
+        @@@@@Global Variables@@@@@
+"""
+
 #initializing DORAEMON LOCATION
 dor_loc_x = 120
 dor_loc_y = 120
 dor_velocity = 5
 
 #initializing laser location
-laser_loc_x = random.randint(0, 240)
+rand_float = 1 # this variable decides the area of laser
+velocity_of_laser = 10
+laser_loc_x = random.randint(15, 225)
 laser_loc_y = 0
+root_rand_float = 1
 
+# 1 stage per 10 scores
+stage = 1
+stage_up_available = False
 
-#ULTIMATE SKILL : defense all attacks for 5sec
-cool_time = 20
-
-#score 
+#score
+prev_score = -1
 score = 0
 
-#!!!!!!FUNCTIONS!!!!!!
+#Variables Related to ultimate skill 1
+prev_time_1 = time.time()
+curr_time_skill_1 = 0
+lasting_time_1 = 5
 
+#Variables Related to ultimate skill 2
+prev_time_2 = time.time()
+button_pressed_2 = True
+curr_time_skill_2 = 0
+lasting_time_2 = 5
+
+
+"""
+        @@@@@FUNCTIONS@@@@@
+"""
+# the function that draws doraemon
 def Doraemon(x_dor, y_dor, doraemon):
-    # square of 40 
     #draw.rectangle((x_dor - 20, y_dor - 20, x_dor + 20, y_dor + 20), outline=(255, 255, 255), fill=(70, 161, 222))
     image.paste(doraemon, (x_dor - 20,y_dor - 20), doraemon)
 
-    
+
+# this function draws laser with jingu, and judges whether doraemon was damaged or not
 def Laser(jingu):
-    
-    
     global dor_loc_x
     global dor_lox_y
     global laser_loc_x
     global laser_loc_y
-    global score
     global velocity_of_laser
+    global score
+    global root_rand_float
     
+    # the x coordinate of laser. the random coordinate is designated in the range +- 100 of doraemon
+    # the y coordinate of laser. if y >= 240 (laser arrives at the bottom, user get 1 score)
     laser_loc_y += velocity_of_laser
     if laser_loc_y >= 240:
-        laser_loc_x = random.randint(15, 225)
+        if dor_loc_x - 100 <= 15:
+            laser_loc_x = random.randint(15, dor_loc_x + 100)
+        elif dor_loc_x + 100 >= 225:
+            laser_loc_x = random.randint(dor_loc_x - 100, 225)
         laser_loc_y = 0
         score += 1
     
-    #triangle coordinate
+    # if over stage 1, difficulty goes up
+    if stage > 1:
+        root_rand_float = np.sqrt(random.uniform(0.8, 1.2)) * stage
+    #this part draws laser. variables below are used to draw triangle coordinate
     top_x = laser_loc_x
     top_y = laser_loc_y
-    left_x = laser_loc_x - 5
-    bottom_y = laser_loc_y + 8.66
-    right_x = laser_loc_x + 5
+    left_x = laser_loc_x - 5 * root_rand_float
+    bottom_y = laser_loc_y + 8.66 * root_rand_float
+    right_x = laser_loc_x + 5 * root_rand_float
     
+    #jingu appears at the top of the display. and laser comes out on his center
     image.paste(jingu, (laser_loc_x - 15, 0), jingu)
     
+    #laser drawing
     draw.polygon([(top_x, top_y), (left_x, bottom_y), (right_x, bottom_y)],
                  outline=(random.randint(-100, 100) % 256, random.randint(-100, 100) % 256, random.randint(-100, 100) % 256),
                  fill=(255, 0, 0))
     
-    # deciding box
+    #judging box
     #draw.rectangle((dor_loc_x - 15, dor_loc_y - 15, dor_loc_x + 20, dor_loc_y + 25), outline=0, fill=(255, 255, 255))
     
     # if laser touches doraemon, exit the game
@@ -166,100 +202,139 @@ def Laser(jingu):
                     disp.image(image)
                     time.sleep(0.3)
                     draw.text((30, 140),"||GOT YOU||", font=fnt, fill=rcolor)
+                    time.sleep(0.3)
+                    draw.text((40, 200), "SCORE", font=fnt, fill=rcolor)
+                    draw.text((150, 200), str(score), font=fnt, fill=rcolor)
                     disp.image(image)
                 time.sleep(2)
                 exit()
-                
-    # if laser arrives at bottom, initialize the location of the laser to the top             
-    if laser_loc_y >= 240:
-        laser_loc_x = random.randint(0, 240)
-        laser_loc_y = 0
-        score += 1
-            
+
+
+# Ultimate Skill 1 is to avoid all the attacks from doraemon.
 def ultimate_skill_1(dor_loc_x, dor_loc_y):
     
-    global last_ultimate_1
+    global curr_time_skill_1
+    global prev_time_1
+    global lasting_time_1
     
-    if time.time() - last_ultimate_1 >= 30:
+    if lasting_time_1 < 0.1:
+        prev_time_1 = time.time()
+        curr_time_skill_1 = time.time()
+        lasting_time_1 = 5
+        image.paste(ultimate_1, (210, 240), ultimate_1)
+        return False
+    
+    if lasting_time_1 >= 0.1 and curr_time_skill_1 - prev_time_1 >= 30:
         image.paste(ultimate_1, (210, 210), ultimate_1)
         if not button_A.value:
-            last_ultimate_1 = time.time() - 5
-            draw.rectangle((210, 210, 240, 240), outline=0, fill=0)
             draw.ellipse((dor_loc_x - 25, dor_loc_y - 25, dor_loc_x + 25, dor_loc_y + 35),
                  fill = (random.randint(-100, 100) % 256, random.randint(-100, 100) % 256, random.randint(-100, 100) % 256),
                  outline = (255, 255, 0))
+            lasting_time_1 = lasting_time_1 - 0.05
+            curr_time_skill_1 = time.time()
             return True
         return False
-    else:
+    else :
         return False
+    
     
 def ultimate_skill_2():
     
     global dor_velocity
-    global last_ultimate_2
+    global prev_time_2
+    global curr_time_skill_2
+    global lasting_time_2
+    global button_pressed_2
     
-    if time.time() - last_ultimate_2 >= 30:
+    if lasting_time_2 < 0.1:
+        prev_time_2 = time.time()
+        curr_time_skill_2 = time.time()
+        lasting_time_2 = 5
+        dor_velocity = 5
+        button_pressed_2 = True
+        image.paste(ultimate_2, (210, 240), ultimate_2)
+        
+    if lasting_time_2 >= 0.1 and curr_time_skill_2 - prev_time_2 >= 30:
         image.paste(ultimate_2, (180, 210), ultimate_2)
         if not button_B.value:
-            draw.rectangle((210, 210, 240, 240), outline=0, fill=0)
-            dor_velocity = dor_velocity * 1.1
-        
+            lasting_time_2 = lasting_time_2 - 0.05
+            curr_time_skill_2 = time.time()
+            if button_pressed_2:
+                dor_velocity = dor_velocity * 2
+                button_pressed_2 = False
+                
+def stage_up():
+    global score
+    global prev_score
+    global stage
+    global stage_up_available
+    global laser_loc_y
+    global rand_float
+    
+    if score % 10 == 0 and score > 0 and not score == prev_score:
+        stage = stage + 1
+        rand_float = random.uniform(0.8, 1.2) * stage
+
 def Up(y):
     if y <= 30:
        y = 30
     else:
         global dor_loc_y
-        dor_loc_y -= 5
-        y -= 5
+        global dor_velocity
+        dor_loc_y -= dor_velocity
+        y -= dor_velocity
     return y
+
 
 def Down(y):
     if y >= 210:
         y = 210
     else:
         global dor_loc_y
-        dor_loc_y += 5
-        y += 5
+        global dor_velocity
+        dor_loc_y += dor_velocity
+        y += dor_velocity
     return y
+
 
 def Left(x):
     if x <= 30:
         x = 30
     else:
         global dor_loc_x
-        dor_loc_x -= 5
-        x -= 5
+        global dor_velocity
+        dor_loc_x -= dor_velocity
+        x -= dor_velocity
     return x
+
 
 def Right(x):
     if x >= 210:
         x = 210
     else:
         global dor_loc_x
-        dor_loc_x += 5
-        x += 5
+        global dor_velocity
+        dor_loc_x += dor_velocity
+        x += dor_velocity
     return x
-    
 
-stage = 1
-start = time.time()
-velocity_of_laser = 10
-complete_up_velocity = False
 
-#!!!!!!LOOP!!!!!!
+"""
+    @@@@@LOOP@@@@@
+"""
 while True:
-    
+    #background
     image.paste(bg, (0, 0), bg)
+    
+    #score board
     draw.text((0, 0), str(score), font=fnt, fill=(0, 0, 0))
+    draw.text((0, 200), str(stage), font=fnt, fill=(0, 0, 0))
     
-    # whenever user gets 10 scores, laser gets 5% more velocity
+    curr_time_skill_1 = time.time()
+    curr_time_skill_2 = time.time()
     
-    if stage - 1 :
-        velocity_of_laser = velocity_of_laser * 1.05
-        complete_up_velocity = False
+    # stage_up_available = prev_score == score
     
-        
-    complete_up_velocity = False
     
     if not button_U.value:  # up pressed
         Up(dor_loc_y)
@@ -276,14 +351,11 @@ while True:
     if not button_C.value:  # center pressed
         pass
     
-    if not button_A.value:  # 5 pressed
-        ultimate_skill_1(dor_loc_x, dor_loc_y)
+    # if curr_time_skill_1 - prev_time >= 30s, activete skill 1 button
+    ultimate_skill_1(dor_loc_x, dor_loc_y)
     
-    
-    if not button_B.value:  # 6 pressed
-        ultimate_skill_2()
-    
-    
+     # if curr_time_skill_2 - prev_time >= 30s, activete skill 2 button
+    ultimate_skill_2()
     
     Doraemon(dor_loc_x, dor_loc_y, doraemon_character)
     
@@ -295,8 +367,11 @@ while True:
     # Clear Display
     draw.rectangle((0, 0, width, height), outline=0, fill=0)
     
-    if score % 10 == 0 and score > 0:
-        complete_up_velocity = True
+    # whenever user gets 10 scores, 1 stage level up
+    stage_up()
+    
+    prev_score = score
+    
 
     time.sleep(0.01)
 
