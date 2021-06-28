@@ -73,7 +73,7 @@ time.sleep(1)
 
 # Game Start display
 draw.rectangle((0, 0, width, height), outline=0, fill=(0, 0, 0))
-rcolor = tuple(int(x * 255) for x in hsv_to_rgb(random.random(), random.random(), random.random()))
+rcolor = tuple(int(x * 255) for x in hsv_to_rgb(random.random(), 1, 1))
 draw.text((-1, 100), "[[GAME START]]", font=fnt, fill=rcolor)
 disp.image(image)
 time.sleep(2)
