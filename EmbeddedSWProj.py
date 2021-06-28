@@ -218,6 +218,7 @@ def ultimate_skill_1(dor_loc_x, dor_loc_y):
     #if there is time remaining
     if lasting_time_1 >= 0.1 and curr_time_skill_1 - prev_time_1 >= 30:
         image.paste(ultimate_1, (210, 210), ultimate_1)
+        # if #5 button pressed
         if not button_A.value:
             draw.ellipse((dor_loc_x - 25, dor_loc_y - 25, dor_loc_x + 25, dor_loc_y + 35),
                  fill = (random.randint(-100, 100) % 256, random.randint(-100, 100) % 256, random.randint(-100, 100) % 256),
@@ -252,6 +253,7 @@ def ultimate_skill_2():
     # if there is time remaining
     if lasting_time_2 >= 0.1 and curr_time_skill_2 - prev_time_2 >= 30:
         image.paste(ultimate_2, (180, 210), ultimate_2)
+        # if #6 button pressed
         if not button_B.value:
             if button_pressed_2:
                 dor_velocity = dor_velocity * 2
