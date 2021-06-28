@@ -389,7 +389,7 @@ while True:
     
     prev_score = score
     
-    # check the changes of the laser area
+    # check the weight changes of the laser area
     #print(root_rand_float)
     
 
