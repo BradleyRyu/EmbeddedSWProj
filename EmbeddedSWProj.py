@@ -65,16 +65,15 @@ image = Image.new("RGBA", (width, height))
 draw = ImageDraw.Draw(image)
 fnt = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 30)
 
-# Loading display.
+# Loading display. and 
 doraemon = Image.open("bamboo_dor.png")
 doraemon_bg = doraemon.resize((width, height))
-doraemon_character = doraemon.resize((50, 50))
 disp.image(doraemon_bg)
 time.sleep(1)
 
 # Game Start display
 draw.rectangle((0, 0, width, height), outline=0, fill=(0, 0, 0))
-rcolor = tuple(int(x * 255) for x in hsv_to_rgb(random.random(), 1, 1))
+rcolor = tuple(int(x * 255) for x in hsv_to_rgb(random.random(), random.random(), random.random()))
 draw.text((-1, 100), "[[GAME START]]", font=fnt, fill=rcolor)
 disp.image(image)
 time.sleep(2)
@@ -89,6 +88,9 @@ disp.image(image)
 #BackGround
 bg_temp = Image.open("background.png")
 bg = bg_temp.resize((240, 240))
+
+#Doraemon
+doraemon_character = doraemon.resize((50, 50))
 
 #Jin Gu
 jingu_temp = Image.open("bamboo_njg.png")
@@ -164,14 +166,16 @@ def Laser(jingu):
     # the y coordinate of laser. if y >= 240 (laser arrives at the bottom, user get 1 score)
     laser_loc_y += velocity_of_laser
     if laser_loc_y >= 240:
-        if dor_loc_x - 100 <= 15:
-            laser_loc_x = random.randint(15, dor_loc_x + 100)
-        elif dor_loc_x + 100 >= 225:
-            laser_loc_x = random.randint(dor_loc_x - 100, 225)
+        if dor_loc_x - 80 <= 15:
+            laser_loc_x = random.randint(15, dor_loc_x + 80)
+        elif dor_loc_x + 80 >= 225:
+            laser_loc_x = random.randint(dor_loc_x - 80, 225)
+        else:
+            laser_loc_x = random.randint(dor_loc_x - 80, dor_loc_x + 80)
         laser_loc_y = 0
         score += 1
     
-    # if over stage 1, difficulty goes up
+    # if over stage 1, difficulty goes up for every stage
     if stage > 1:
         root_rand_float = np.sqrt(random.uniform(0.8, 1.2) * stage)
     #this part draws laser. variables below are used to draw triangle coordinate
@@ -268,6 +272,7 @@ def stage_up():
     if score % 10 == 0 and score > 0 and not score == prev_score:
         stage = stage + 1
         
+        
 def end_game(top_x, top_y, left_x, bottom_y, right_x):
     
     if not ultimate_skill_1(dor_loc_x, dor_loc_y):
@@ -285,6 +290,7 @@ def end_game(top_x, top_y, left_x, bottom_y, right_x):
                     disp.image(image)
                 time.sleep(2)
                 exit()
+                
 
 def Up(y):
     if y <= 30:
@@ -339,14 +345,12 @@ while True:
     
     #score board
     draw.text((0, 0), str(score), font=fnt, fill=(0, 0, 0))
-    draw.text((0, 200), str(stage), font=fnt, fill=(0, 0, 0))
+    #draw.text((0, 200), str(stage), font=fnt, fill=(0, 0, 0))
     
     curr_time_skill_1 = time.time()
     curr_time_skill_2 = time.time()
     
-    # stage_up_available = prev_score == score
-    
-    
+    # buttons moving doraemon
     if not button_U.value:  # up pressed
         Up(dor_loc_y)
     
@@ -368,8 +372,10 @@ while True:
      # if curr_time_skill_2 - prev_time >= 30s, activete skill 2 button
     ultimate_skill_2()
     
+    # this function is to move doraemon
     Doraemon(dor_loc_x, dor_loc_y, doraemon_character)
     
+    #this function draws laser
     Laser(jingu_character)
     
     # Display the Image
@@ -382,6 +388,9 @@ while True:
     stage_up()
     
     prev_score = score
+    
+    # check the changes of the laser area
+    #print(root_rand_float)
     
 
     time.sleep(0.01)
