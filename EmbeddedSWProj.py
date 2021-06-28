@@ -162,7 +162,7 @@ def Laser(jingu):
     global score
     global root_rand_float
     
-    # the x coordinate of laser. the random coordinate is designated in the range +- 100 of doraemon
+    # the x coordinate of laser. the random coordinate is designated in the range +- 80 of doraemon
     # the y coordinate of laser. if y >= 240 (laser arrives at the bottom, user get 1 score)
     laser_loc_y += velocity_of_laser
     if laser_loc_y >= 240:
